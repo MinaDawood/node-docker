@@ -6,15 +6,16 @@ exports.signUp = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 12);
-    const newUesr = await User.create({
+    const newUser = await User.create({
       username,
       password: hashedPassword,
     });
+    req.session.user = newUser;
 
     res.status(201).json({
       status: "success",
       data: {
-        user: newUesr,
+        user: newUser,
       },
     });
   } catch (e) {
@@ -40,6 +41,7 @@ exports.login = async (req, res) => {
     const isCorrect = await bcrypt.compare(password, user.password);
 
     if (isCorrect) {
+      req.session.user = user;
       res.status(200).json({
         status: "success",
       });
